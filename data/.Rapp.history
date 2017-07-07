@@ -1,0 +1,2 @@
+load("/Users/chavent/Seafile/R/ClustGeo2/data/gironde0.RData")
+load("/Users/chavent/Seafile/R/mes_packages/ClustGeo/data/estuary.RData")

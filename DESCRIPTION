@@ -1,0 +1,26 @@
+Package: ClustGeo
+Type: Package
+Title: Hierarchical clustering with spatial constraints
+Version: 2.0
+Authors@R: c(person("Marie", "Chavent", role = c("aut", "cre"),
+                    email = "Marie.Chavent@u-bordeaux.fr"),
+             person("Vanessa", "Kuentz", role = "aut"),
+             person("Amaury", "Labenne", role = "aut"),
+             person("Jerome", "Saracco", role = "aut"))
+Author: Marie Chavent [aut, cre],
+    Vanessa Kuentz [aut],
+    Amaury Labenne [aut],
+    Jerome Saracco [aut]
+Maintainer: Marie Chavent <Marie.Chavent@u-bordeaux.fr>
+Description: This R package implements a Ward-like hierarchical clustering algorithm including spatial-geographical constraints.
+Depends:
+    R (>= 3.2.2)
+Imports:
+  sp
+License: GPL (>=2.0)
+LazyData: true
+Suggests:
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1

@@ -12,15 +12,15 @@ Author: Marie Chavent [aut, cre],
     Amaury Labenne [aut],
     Jerome Saracco [aut]
 Maintainer: Marie Chavent <Marie.Chavent@u-bordeaux.fr>
-Description: This R package implements a Ward-like hierarchical clustering algorithm including spatial-geographical constraints.
+Description: This R package implements a Ward-like hierarchical clustering
+    algorithm including spatial/geographical constraints.
 Depends:
-    R (>= 3.2.2)
-Imports:
-  sp
+    R  (>= 3.0.0)
+Imports: sp, spdep
 License: GPL (>=2.0)
 LazyData: true
 Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 5.0.1

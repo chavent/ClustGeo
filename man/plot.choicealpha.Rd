@@ -50,3 +50,4 @@ plot(cr,cex=0.8,norm=TRUE,cex.lab=0.8,ylab="pev",
 \seealso{
 \code{\link{choicealpha}}
 }
+

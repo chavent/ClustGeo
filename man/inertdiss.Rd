@@ -28,3 +28,4 @@ inert(Z) #equals for euclidean distance
 w <- estuary$map@data$POPULATION # non uniform weights 
 inertdiss(dist(Z),wt=w)
 }
+

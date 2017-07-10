@@ -39,3 +39,4 @@ head(estuary$dat)
 sp::plot(estuary$map)
 }
 \keyword{data}
+

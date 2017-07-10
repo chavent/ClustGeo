@@ -18,3 +18,4 @@ The function \code{\link{as.dist}} can be used to transform an object of class m
 This function performs the pseudo within-cluster inertia of a partition from a dissimilarity matrix.
 }
 \keyword{internal}
+

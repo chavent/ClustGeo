@@ -231,11 +231,11 @@ Let us construct a different type of matrix $D_1$ to take the neighborhood betwe
 Two regions with contiguous boundaries, that is sharing one or more boundary point are considered as neighbours.  Let us first build the adjacency matrix $A$.
 
 ```{r,fig.height=4,fig.width=4,fig.align="center",warning=FALSE,message=FALSE}
-library(spdep)
-list.nb <- poly2nb(map,row.names = rownames(dat)) #list of neighbours of each city
+#library(spdep)
+list.nb <- spdep::poly2nb(map,row.names = rownames(dat)) #list of neighbours of each city
 city_label[list.nb[[117]]] # list of the neighbours of BORDEAUX
 
-A <- nb2mat(list.nb,style="B")
+A <- spdep::nb2mat(list.nb,style="B")
 diag(A) <- 1
 colnames(A) <- rownames(A) <- city_label
 A[1:5,1:5]

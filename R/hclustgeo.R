@@ -127,4 +127,8 @@ NULL
 NULL
 #' @importClassesFrom sp SpatialPolygonsDataFrame
 NULL
+#' @importFrom spdep nb2mat
+NULL
+#' @importFrom spdep poly2nb
+NULL
 

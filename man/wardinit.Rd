@@ -23,3 +23,4 @@ This function calculates the Ward aggregation measures between pairs of singleto
 The Ward agreggation measure between to singletons i and j weighted by wi and wj is : (wiwj)/(wi+wj)dij^2
 where dij is the dissimilarity between i and j.
 }
+

@@ -44,3 +44,4 @@ cr$Qnorm # normalized proportion of explained pseudo inertia
 \references{
 M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco,
 }
+

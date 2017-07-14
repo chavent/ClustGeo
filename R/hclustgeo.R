@@ -44,7 +44,8 @@
 #' part <- cutree(tree,k=5)
 #' sp::plot(estuary$map,border="grey",col=part)
 #' @references 
-#' M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco, 
+#' M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
+#' for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
 #' @export
 
 
@@ -110,6 +111,9 @@ hclustgeo <- function(D0, D1=NULL, alpha=0,scale=TRUE, wt=NULL) {
 #' \code{housing.appart} is the ratio of apartment housing. \code{agri.land} is the part of 
 #' agricultural area of the municipality.
 #' @keywords data
+#' @references 
+#' M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
+#' for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
 #' @examples
 #' data(estuary)
 #' names(estuary)

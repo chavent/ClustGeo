@@ -4,7 +4,9 @@
 #' The function \code{\link{as.dist}} can be used to transform an object of class matrix to object of class "dist".
 #' @param part a vector with group membership.
 #' @param wt vector with the weights of the observations
-##' @keywords internal
+#' @references 
+#' M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
+#' for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
 #' @export
 withindiss <- function (D, part, wt = NULL) {
   n <- as.integer(attr(D, "Size"))

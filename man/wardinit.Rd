@@ -23,4 +23,8 @@ This function calculates the Ward aggregation measures between pairs of singleto
 The Ward agreggation measure between to singletons i and j weighted by wi and wj is : (wiwj)/(wi+wj)dij^2
 where dij is the dissimilarity between i and j.
 }
+\references{
+M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
+for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
+}
 

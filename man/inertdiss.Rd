@@ -32,4 +32,3 @@ inertdiss(dist(Z),wt=w)
 M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
 for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
 }
-

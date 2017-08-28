@@ -1,8 +1,12 @@
 ---
-title: "Introduction to Clustgeo"
-output: rmarkdown::html_vignette
+title: "Introduction to ClustGeo"
+author: "Marie Chavent"
+date: "`r Sys.Date()`"
+output: 
+  html_vignette: 
+    toc: yes
 vignette: >
-  %\VignetteIndexEntry{Put the title of your vignette here}
+  %\VignetteIndexEntry{Introduction to ClustGeo}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---

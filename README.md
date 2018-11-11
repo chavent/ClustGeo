@@ -1,6 +1,10 @@
 ## Description
 
-This package performs hierarchical clustering with spatial soft-constraints. 
+The R package `ClustGeo` implements a Ward-like hierarchical clustering algorithm including spatial/geographical constraints. 
+
+Details are available is the following vignette:
+
+https://chavent.github.io/ClustGeo
 
 ## Install
 

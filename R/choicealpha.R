@@ -1,21 +1,35 @@
-#' @title Empirical choice of the mixing parameter
-#' @description This function calculates the proportion (resp. normalized proportion) of explained inertia of
-#'  the partitions in K clusters obtained with the Ward-like \code{hclustgeo} procedure for a range 
-#'  of mixing parameters alpha. When the proportion (resp. normalized proportion) of explained inertia based on D0 decreases,
-#'   the proportion (resp. normalized proportion)
-#'  of explained inertia based on D1 increases. The plot of these criteria can help the user in the choice of the
-#'  mixing parameter alpha.
-#' @param D0 an object of class "dist" with the dissimilarities between the n observations. 
-#' The function \code{\link{as.dist}} can be used to transform an object of class matrix to object of class "dist".
-#' @param D1 an object of class "dist" with other dissimilarities between the same n observations. 
+#' @title Choice of the mixing parameter
+#' @description This function calculates the proportion of inertia explained by the partitions in \code{K} clusters
+#' for a range of mixing parameters \code{alpha}. When the proportion 
+#' of explained inertia calculated with \code{D0}
+#'  decreases, the proportion of explained inertia
+#'  calculated with \code{D1} increases. The plot of the two curves of explained
+#'  inertia (one for \code{D0} and one for \code{D1}) helps
+#'  the user to choose the mixing parameter \code{alpha}.
+#'  
+#' @param D0 a dissimilarity matrix of class \code{dist}. The function \code{\link{as.dist}} can be used to transform an 
+#' object of class \code{matrix} to object of class \code{dist}.
+#' @param D1 an other dissimilarity matrix of class \code{dist}.
 #' @param range.alpha  a vector of real values between 0 and 1. 
 #' @param K  the  number of clusters. 
-#' @param wt vector with the weights of the observations. By default, wt=NULL corresponds to
-#' the case where all observations are weighted by 1/n.
-#' @param scale if TRUE the two dissimilarity matrix are scaled i.e. divided by their max.
-#' @param graph if TRUE the two graphics (proportion and normalized proportion of explained inertia) are drawn.
-# @keywords internal
+#' @param wt vector with the weights of the observations. By default, wt=NULL 
+#' corresponds to the case where all observations are weighted by 1/n.
+#' @param scale if TRUE the two dissimilarity matrices are scaled i.e. divided
+#'  by their max.
+#' @param graph if TRUE, two graphics (proportion and normalized proportion 
+#' of explained inertia) are drawn.
+#' 
+#' 
+#' @return An object with S3 class "choicealpha" and the following components:
+#' \item{Q}{a matrix of dimension \code{length(range.alpha)} times \code{2}
+#'  with the proportion of explained inertia calculated with \code{D0} (first column) 
+#'  and calculated with \code{D1} (second column)}
+#' \item{Qnorm}{a matrix of dimension \code{length(range.alpha)} times \code{2}
+#'  with the proportion of normalized explained inertia calculated with 
+#'  \code{D0} (first column) and calculated with \code{D1} (second column)}
+#' 
 #' @export
+#' 
 #' @examples
 #' data(estuary)
 #' D0 <- dist(estuary$dat) # the socio-demographic distances
@@ -25,10 +39,13 @@
 #' cr <- choicealpha(D0,D1,range.alpha,K,graph=TRUE)
 #' cr$Q # proportion of explained pseudo inertia
 #' cr$Qnorm # normalized proportion of explained pseudo inertia
+#' 
+#' @seealso \code{\link{plot.choicealpha}}, \code{\link{hclustgeo}}
+#' 
 #' @references 
-#' M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
-#' for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
-
+#' M. Chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco. ClustGeo: an R package
+#' for hierarchical clustering with spatial constraints.
+#' Comput Stat (2018) 33: 1799-1822. 
 
 choicealpha <- function(D0, D1, range.alpha,K, wt=NULL,scale=TRUE,graph=TRUE) {
 
@@ -67,7 +84,7 @@ choicealpha <- function(D0, D1, range.alpha,K, wt=NULL,scale=TRUE,graph=TRUE) {
   colnames(W) <- c("W0","W1")
   for (i in 1:length(range.alpha)) {
     tree <- hclustgeo(D0,D1,range.alpha[i],scale=scale,wt=wt)
-    part <- cutree(tree,k=K)
+    part <- stats::cutree(tree,k=K)
     W[i,1] <- withindiss(D0,part,wt)
     W[i,2] <- withindiss(D1,part,wt)
   }
@@ -96,20 +113,23 @@ choicealpha <- function(D0, D1, range.alpha,K, wt=NULL,scale=TRUE,graph=TRUE) {
     listpos <- c("topleft","bottomleft","topright","bottomright")
     pos <- listpos[order(c(1-Q[1,1],Q[1,2],1-Q[length(range.alpha),2],
                          Q[length(range.alpha),1]),decreasing=TRUE)[1]]
-    matplot(range.alpha,Q,xlab="alpha",ylim=c(0,1), 
+    graphics::matplot(range.alpha,Q,xlab="alpha",ylim=c(0,1), 
             ylab="Q",type="b",pch=c(8,16),lty=1:2,
             main=paste("K=",K,"clusters"))
-    #cex.lab=0.8,cex.main=0.8,cex.axis=0.8
-    legend(pos,legend=paste("based on",c("D0","D1")), col=1:2,lty=1,pch=16,bty="n",cex=1)
+    graphics::legend(pos,legend=paste("based on",c("D0","D1")), col=1:2,lty=1,
+           pch=16,bty="n",cex=1)
     
     listpos <- c("bottomleft","bottomright")
     pos <- listpos[order(c(Qnorm[1,2],Qnorm[length(range.alpha),1]),decreasing=TRUE)[1]]
-    matplot(range.alpha,Qnorm,xlab="alpha",ylim=c(0,1), 
+    graphics::matplot(range.alpha,Qnorm,xlab="alpha",ylim=c(0,1), 
             ylab="Qnorm",type="b",pch=c(8,16),lty=1:2,
             main=paste("K=",K,"clusters"))
-    legend(pos,legend=paste("based on",c("D0","D1")), col=1:2,lty=1,pch=16,bty="n",cex=1)
-    mtext(side=3,paste("of ",round(Q[1,1]*100,digits=0),"%",sep=""),cex=1,adj=0)
-    mtext(side=3,paste("of ",round(Q[length(range.alpha),2]*100,digits=0),"%",sep=""),cex=1,adj=1)
+    graphics::legend(pos,legend=paste("based on",c("D0","D1")), 
+                     col=1:2,lty=1,pch=16,bty="n",cex=1)
+    graphics::mtext(side=3,paste("of ",round(Q[1,1]*100,digits=0),"%",sep=""),
+                    cex=1,adj=0)
+    graphics::mtext(side=3,paste("of ",round(Q[length(range.alpha),2]*100,
+                                             digits=0),"%",sep=""),cex=1,adj=1)
   }
   retlist <- list(Q=Q,Qnorm=Qnorm,range.alpha=range.alpha,K=K)
   class(retlist) <- "choicealpha"

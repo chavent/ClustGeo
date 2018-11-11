@@ -2,24 +2,29 @@
 % Please edit documentation in R/plot.choicealpha.R
 \name{plot.choicealpha}
 \alias{plot.choicealpha}
-\title{Plot of the mixing parameter}
+\title{Plot to choose the mixing parameter}
 \usage{
-\method{plot}{choicealpha}(x, norm = FALSE, lty = 1:2, pch = c(8, 16),
-  type = c("b", "b"), col = 1:2, xlab = "alpha", ylab = NULL,
+\method{plot}{choicealpha}(x, norm = FALSE, lty = 1:2, pch = c(8,
+  16), type = c("b", "b"), col = 1:2, xlab = "alpha", ylab = NULL,
   legend = NULL, cex = 1, ...)
 }
 \arguments{
 \item{x}{an object of class \code{choicealpha}.}
 
-\item{norm}{if TRUE, the criterion Qnorm is plotted. Otherwise, it is Q.}
+\item{norm}{if TRUE, the normalized explained inertia are plotted. 
+Otherwise, the explained inertia are plotted.}
 
-\item{lty}{a vector of size 2 with the line types of the two curves. See \link{par}}
+\item{lty}{a vector of size 2 with the line types of the two curves. 
+See \link{par}}
 
-\item{pch}{a vector of size 2 specifying the symbol for the points of the two curves. See \link{par}}
+\item{pch}{a vector of size 2 specifying the symbol for the points of the 
+two curves. See \link{par}}
 
-\item{type}{a vector of size 2 specifying the type of lines of the two curves. See \link{par}}
+\item{type}{a vector of size 2 specifying the type of lines of the two 
+curves. See \link{par}}
 
-\item{col}{a vector of size 2 specifying the colors the two curves. See \link{par}}
+\item{col}{a vector of size 2 specifying the colors the two curves. 
+See \link{par}}
 
 \item{xlab}{the title fot the x axis.}
 
@@ -32,8 +37,9 @@
 \item{\dots}{further arguments passed to or from other methods.}
 }
 \description{
-Plot of the criterion Q or Qnorm obtained in 
-output of the function \code{choicealpha}.
+Plot two curves of explained
+ inertia (one for \code{D0} and one for \code{D1}) calculated with 
+ \code{choicealpha}.
 }
 \examples{
 data(estuary)
@@ -46,6 +52,12 @@ plot(cr,cex=0.8,norm=FALSE,cex.lab=0.8,ylab="pev",
          col=3:4,legend=c("socio-demo","geo"), xlab="mixing parameter")
 plot(cr,cex=0.8,norm=TRUE,cex.lab=0.8,ylab="pev",
          col=5:6,pch=5:6,legend=c("socio-demo","geo"), xlab="mixing parameter")
+         
+}
+\references{
+M. Chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco. ClustGeo: an R package
+for hierarchical clustering with spatial constraints.
+Comput Stat (2018) 33: 1799-1822.
 }
 \seealso{
 \code{\link{choicealpha}}

@@ -2,21 +2,26 @@
 % Please edit documentation in R/hclustgeo.R
 \name{hclustgeo}
 \alias{hclustgeo}
-\title{Hierarchical clustering with geographical contraints}
+\title{Ward clustering with soft contiguity contraints}
 \usage{
 hclustgeo(D0, D1 = NULL, alpha = 0, scale = TRUE, wt = NULL)
 }
 \arguments{
-\item{D0}{an object of class "dist" with the dissimilarities between the n observations. 
-The function \code{\link{as.dist}} can be used to transform an object of class matrix to object of class "dist".}
+\item{D0}{an object of class \code{dist} with the dissimilarities between the n observations. 
+The function \code{\link{as.dist}} can be used to transform an object of 
+class \code{matrix} to object of class \code{dist}.}
 
-\item{D1}{an object of class "dist" with other dissimilarities between the same n observations.}
+\item{D1}{an object of class "dist" with other dissimilarities between the 
+same n observations.}
 
-\item{alpha}{a real value between 0 and 1. This mixing parameter gives the relative importance of D0 compared to D1.
-By default, this parameter is equal to 0 and D0 is used alone in the clustering process.}
+\item{alpha}{a real value between 0 and 1. This mixing parameter gives the 
+relative importance of \code{D0} compared to \code{D1}.
+By default, this parameter is equal to 0 and \code{D0} is used alone in the
+ clustering process.}
 
-\item{scale}{if TRUE the two dissimilarity matrix D0 and D1 are scaled i.e. divided by their max. If D1=NULL, 
-this parameter is no used and D0 is not scaled.}
+\item{scale}{if TRUE the two dissimilarity matric \code{D0} and \code{D1} 
+are scaled i.e. divided by their max. If \code{D1}=NULL, this parameter 
+is no used and D0 is not scaled.}
 
 \item{wt}{vector with the weights of the observations. By default, wt=NULL corresponds to
 the case where all observations are weighted by 1/n.}
@@ -25,21 +30,25 @@ the case where all observations are weighted by 1/n.}
 Returns an object of class \code{\link{hclust}}.
 }
 \description{
-This function implements a Ward-like hierarchical clustering algorithm 
-including soft contiguity constraints. This algorithm takes as input two dissimilarity matrices 
-D0 and D1 and a mixing parameter alpha between 0 an 1. The dissimilarities can be non 
-euclidean and the weights of the observations can be non uniform. 
-The first matrix gives the dissimilarities in the "feature space" 
-(socio-demographic variables or grey levels for instance). The second matrix gives the dissimilarities in the 
- "constraint" space. For instance, D1 can be a matrix of geographical distances or a matrix 
-build from the contiguity matrix C.
-The mixing parameter alpha sets the importance of the constraint in the clustering procedure.
+Implements a Ward-like hierarchical clustering 
+algorithm including soft contiguity constraints. The algorithm takes as
+input two dissimilarity matrices \code{D0} and \code{D1} and a mixing 
+parameter alpha between 0 an 1. The dissimilarities can be non euclidean 
+and the weights of the observations can be non uniform. The first matrix 
+gives the dissimilarities in the "feature space". The second matrix gives 
+the dissimilarities in the  "constraint" space. For instance, \code{D1}
+ can be a matrix of geographical distances or a matrix  build from 
+ a contiguity matrix. The mixing parameter \code{alpha} sets the importance 
+ of the constraint in the clustering process.
 }
 \details{
-The criterion minimized at each stage is a convex combination of the homogeneity criterion 
- calculated with D0 and the homogeneity criterion calculated with D1. 
- The parameter alpha (the weight of this convex combination) controls the weight of the constraint in the quality of the solutions. 
- When alpha increases, the homogeneity calculated with D0 decreases whereas the homogeneity calculated with D1 increases.
+The criterion minimized at each stage is a convex combination of
+ the homogeneity criterion calculated with \code{D0} and the homogeneity 
+ criterion calculated with \code{D1}. The parameter \code{alpha} (the weight
+ of this convex combination) controls the importance of the constraint 
+ in the quality of the solutions. When \code{alpha} increases, 
+ the homogeneity calculated with \code{D0} decreases whereas the
+ homogeneity calculated with \code{D1} increases.
 }
 \examples{
 data(estuary)
@@ -52,7 +61,7 @@ inertdiss(D,wt=w)
 inert(estuary$dat,w=w)
 plot(tree,labels=FALSE)
 part <- cutree(tree,k=5)
-sp::plot(estuary$map,border="grey",col=part)
+sp::plot(estuary$map, border = "grey", col = part)
 
 # with two dissimilarity matrix
 D0 <- dist(estuary$dat) # the socio-demographic distances
@@ -61,9 +70,14 @@ alpha <- 0.2 # the mixing parameter
 tree <- hclustgeo(D0,D1,alpha=alpha,wt=w)
 plot(tree,labels=FALSE)
 part <- cutree(tree,k=5)
-sp::plot(estuary$map,border="grey",col=part)
+sp::plot(estuary$map, border = "grey", col = part)
+
 }
 \references{
-M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
-for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
+M. Chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco. ClustGeo: an R package
+for hierarchical clustering with spatial constraints.
+Comput Stat (2018) 33: 1799-1822.
+}
+\seealso{
+\code{\link{choicealpha}}
 }

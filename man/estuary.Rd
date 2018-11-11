@@ -17,10 +17,10 @@ Information. The calculation of the ratio and recoding of categories have been m
 Irstea Bordeaux.
 }
 \description{
-Data refering to n=303 french municipalities  of gironde estuary (a south-ouest french county).
+Data refering to n=303 French municipalities  of gironde estuary (a south-ouest French county).
 The data are issued from the French population census conducted by the National Institute 
 of Statistics and Economic Studies. The dataset is an extraction of four quantitative 
-socio-economic variables for a subsample of 303 french municipalities located on the
+socio-economic variables for a subsample of 303 French municipalities located on the
 atlantic coast between Royan and Mimizan. \code{employ.rate.city} is the employment rate 
 of the municipality, that is the ratio of the number of individuals who have a job to 
 the population of working age (generally defined, for the purposes of international 
@@ -36,10 +36,10 @@ agricultural area of the municipality.
 data(estuary)
 names(estuary)
 head(estuary$dat)
-sp::plot(estuary$map)
 }
 \references{
-M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
-for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
+M. Chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco. ClustGeo: an R package
+for hierarchical clustering with spatial constraints.
+Comput Stat (2018) 33: 1799-1822.
 }
 \keyword{data}

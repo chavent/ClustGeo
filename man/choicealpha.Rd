@@ -2,34 +2,47 @@
 % Please edit documentation in R/choicealpha.R
 \name{choicealpha}
 \alias{choicealpha}
-\title{Empirical choice of the mixing parameter}
+\title{Choice of the mixing parameter}
 \usage{
-choicealpha(D0, D1, range.alpha, K, wt = NULL, scale = TRUE, graph = TRUE)
+choicealpha(D0, D1, range.alpha, K, wt = NULL, scale = TRUE,
+  graph = TRUE)
 }
 \arguments{
-\item{D0}{an object of class "dist" with the dissimilarities between the n observations. 
-The function \code{\link{as.dist}} can be used to transform an object of class matrix to object of class "dist".}
+\item{D0}{a dissimilarity matrix of class \code{dist}. The function \code{\link{as.dist}} can be used to transform an 
+object of class \code{matrix} to object of class \code{dist}.}
 
-\item{D1}{an object of class "dist" with other dissimilarities between the same n observations.}
+\item{D1}{an other dissimilarity matrix of class \code{dist}.}
 
 \item{range.alpha}{a vector of real values between 0 and 1.}
 
 \item{K}{the  number of clusters.}
 
-\item{wt}{vector with the weights of the observations. By default, wt=NULL corresponds to
-the case where all observations are weighted by 1/n.}
+\item{wt}{vector with the weights of the observations. By default, wt=NULL 
+corresponds to the case where all observations are weighted by 1/n.}
 
-\item{scale}{if TRUE the two dissimilarity matrix are scaled i.e. divided by their max.}
+\item{scale}{if TRUE the two dissimilarity matrices are scaled i.e. divided
+by their max.}
 
-\item{graph}{if TRUE the two graphics (proportion and normalized proportion of explained inertia) are drawn.}
+\item{graph}{if TRUE, two graphics (proportion and normalized proportion 
+of explained inertia) are drawn.}
+}
+\value{
+An object with S3 class "choicealpha" and the following components:
+\item{Q}{a matrix of dimension \code{length(range.alpha)} times \code{2}
+ with the proportion of explained inertia calculated with \code{D0} (first column) 
+ and calculated with \code{D1} (second column)}
+\item{Qnorm}{a matrix of dimension \code{length(range.alpha)} times \code{2}
+ with the proportion of normalized explained inertia calculated with 
+ \code{D0} (first column) and calculated with \code{D1} (second column)}
 }
 \description{
-This function calculates the proportion (resp. normalized proportion) of explained inertia of
- the partitions in K clusters obtained with the Ward-like \code{hclustgeo} procedure for a range 
- of mixing parameters alpha. When the proportion (resp. normalized proportion) of explained inertia based on D0 decreases,
-  the proportion (resp. normalized proportion)
- of explained inertia based on D1 increases. The plot of these criteria can help the user in the choice of the
- mixing parameter alpha.
+This function calculates the proportion of inertia explained by the partitions in \code{K} clusters
+for a range of mixing parameters \code{alpha}. When the proportion 
+of explained inertia calculated with \code{D0}
+ decreases, the proportion of explained inertia
+ calculated with \code{D1} increases. The plot of the two curves of explained
+ inertia (one for \code{D0} and one for \code{D1}) helps
+ the user to choose the mixing parameter \code{alpha}.
 }
 \examples{
 data(estuary)
@@ -40,8 +53,13 @@ K <- 5
 cr <- choicealpha(D0,D1,range.alpha,K,graph=TRUE)
 cr$Q # proportion of explained pseudo inertia
 cr$Qnorm # normalized proportion of explained pseudo inertia
+
 }
 \references{
-M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
-for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
+M. Chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco. ClustGeo: an R package
+for hierarchical clustering with spatial constraints.
+Comput Stat (2018) 33: 1799-1822.
+}
+\seealso{
+\code{\link{plot.choicealpha}}, \code{\link{hclustgeo}}
 }

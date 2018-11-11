@@ -18,6 +18,7 @@ The function \code{\link{as.dist}} can be used to transform an object of class m
 This function performs the pseudo within-cluster inertia of a partition from a dissimilarity matrix.
 }
 \references{
-M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
-for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
+M. Chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco. ClustGeo: an R package
+for hierarchical clustering with spatial constraints.
+Comput Stat (2018) 33: 1799-1822.
 }

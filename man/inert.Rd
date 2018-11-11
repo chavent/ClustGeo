@@ -4,13 +4,13 @@
 \alias{inert}
 \title{Inertia of a cluster}
 \usage{
-inert(Z, indices = 1:nrow(Z), wt = rep(1/nrow(Z), nrow(Z)), M = rep(1,
-  ncol(Z)))
+inert(Z, indices = 1:nrow(Z), wt = rep(1/nrow(Z), nrow(Z)),
+  M = rep(1, ncol(Z)))
 }
 \arguments{
 \item{Z}{matrix data}
 
-\item{indices}{vector representing the subset of rows}
+\item{indices}{vectors representing the subset of rows}
 
 \item{wt}{weight vector}
 
@@ -27,4 +27,5 @@ inert(Z) # number of variables
 
 w <- estuary$map@data$POPULATION # non uniform weights 
 inert(Z,wt=w)
+
 }

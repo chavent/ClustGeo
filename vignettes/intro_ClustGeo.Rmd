@@ -1,21 +1,33 @@
 ---
 title: "Introduction to ClustGeo"
-author: "Marie Chavent"
 date: "`r Sys.Date()`"
 output: 
   html_vignette: 
     toc: yes
+    toc_depth: 4
 vignette: >
   %\VignetteIndexEntry{Introduction to ClustGeo}
+  %\VignetteEncoding{UTF-8}}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,eval=TRUE,fig.align="center",fig.width = 7,fig.height = 6)
 ```
 
-The package  __Clustgeo__ is used here for clustering  $n=303$ french cities. The R dataset __estuary__  is a list of three objects: a matrix __dat__ with the description of the 303 cities on 4 socio-demographic variables, a matrix __D.geo__ with the distances between the town hall of the 303 cities, and an object  __map__ of class "SpatialPolygonsDataFrame".
+The package `ClustGeo` implements a Ward-like hierarchical clustering algorithm including spatial/geographical constraints. Two dissimilarity matrices `D0` and `D1` are inputted, along with  a mixing parameter `alpha` in $[0,1]$. The dissimilarities can be non-Euclidean and the weights of the observations can be non-uniform. The first matrix  gives the dissimilarities in the  "feature space"" and the second matrix gives the dissimilarities in the "constraint space". The criterion minimized at each stage  is a convex combination of the homogeneity criterion calculated with `D0` and the homogeneity criterion calculated with `D1`. The idea is  to determine a value of `alpha` which increases the spatial contiguity without deteriorating too much the quality of the solution based on the variables of interest i.e. those of the feature space. This procedure is illustrated on the `estuary`  dataset available in the package.  
+
+  
+## The `estuary` dataset  
+
+The dataset `estuary`  refers to $n=303$ French municipalities of Gironde estuary (a south-ouest French region). This dataset contains:
+
+  * a data frame `dat` with the description of the 303 municipalities on 4 socio-economic variables, 
+  * a matrix `D.geo` with the distances between the town halls of the 303 municipalities, 
+  * an object  `map` of class `SpatialPolygonsDataFrame` with the map of the municipalities.
+
 
 ```{r}
 library(ClustGeo)
@@ -26,169 +38,113 @@ D.geo <- estuary$D.geo
 map <- estuary$map
 ```
 
-## Ward hierarchical clustering with non euclidean dissimilarity measures and non uniform weights.
-In this section, we show how to implement and interpret Ward hierarchical clustering when the dissimilarities are not necessary euclidean and the weights are not uniform.
+The object `map` is an object of class `SpatialPolygonsDataFrame` (of the package `sp`) and the method `plot`  can be used to visualize the municipalities on the map.
 
+```{r out.width="55%"}
+# description of 5 municipalities in the map
+head(map@data[,4:8]) 
 
-We apply first standard __hclust__ function.
+# plot of the municipalities
+library(sp)
+?"SpatialPolygonsDataFrame-class"
+sp::plot(map, border="grey") # plot method
+sel <- map$NOM_COMM%in% c("BORDEAUX", "ARCACHON", "ROYAN") # label of 3 municipalities
+text(sp::coordinates(map)[sel,],
+     labels = map$NOM_COMM[sel])
 
-```{r}
-n <- nrow(dat)
-D <- dist(dat)
-Delta <- D^2/(2*n)
-tree <- hclust(Delta,method="ward.D")
+# we check that the municipalities in map are the same than those in X
+identical(as.vector(map$INSEE_COM),rownames(dat))
 ```
 
-We can check that the sum of the heights in __hclust__'s dendrogram is equal to the total inertia of the dataset if the dissimilarities are euclidean and to the pseudo inertia otherwise.
-```{r}
-?inertdiss #pseudo inertia when dissimilarities are non euclidean
-?inert #standard inertia otherwise
-inertdiss(D) #pseudo inertia
-inert(dat) # inertia
-sum(tree$height)
-```
+## Hierarchical clustering with soft contiguity constraint.
 
-The same result can be obtained with the function __hclustgeo__ which is a wrapper of __hclust__ taking $D$ as input instead of $\Delta$. 
+The function `hclustgeo` implements a Ward-like hierarchical clustering algorithm with soft contiguity constraint. The main arguments of the function are:
 
-```{r}
-tree <- hclustgeo(D)
-sum(tree$height)
-```
+  * a matrix `D0` with the dissimilarities in the "feature space" (here socio-economic variables for instance). 
+  * a matrix `D1` with the dissimilarities in the  "constraint" space (here a matrix of geographical dissimilarities).
+  * a mixing parameter `alpha` between 0 an 1. The mixing parameter sets the importance of the constraint in the clustering procedure. 
+  * a scaling parameter `scale` with a logical value. If `TRUE` the dissimilarity matrices `D0` and `D1` are scaled between 0 and 1 (that is divided by their maximum value).
 
+The function `choicealpha` implements a procedure to help the user in the choice of a suitable value of the mixing parameter `alpha`. 
 
-When the weights are not  uniform, the calculation of the matrix $\Delta$ takes a few lines of code and the use of the function __hclustgeo__ may be more convenient than __hclust__. 
+Both `hclustgeo` and `choicealpha` can be combined  to find a partition of the $n=303$ French municipalities including geographical contiguity constraint. The two steps of the procedure are :
+
+  1. Find partition in $K$ clusters of the 303 municipalities using the dissimilarity matrix `D0`. The clusters of this partition are homogeneous on the socio-economic variables and no contiguity constraint is used.
+  2. Choose a mixing parameter `alpha` in order to increases the geographical cohesion of the clusters (using the dissimilarity matrix `D1`) without deteriorating too much the homogeneity on the socio-economic variables. 
 
 
-```{r}
-map <- estuary$map
-wt <- map@data$POPULATION # non uniform weights
-# with hclust
-Delta <-  D               
-for (i in 1:(n-1)) {
-  for (j in (i+1):n) {
-    Delta[n*(i-1) - i*(i-1)/2 + j-i] <-
-        Delta[n*(i-1) - i*(i-1)/2 + j-i]^2*wt[i]*wt[j]/(wt[i]+wt[j]) }}
-tree <- hclust(Delta,method="ward.D",members=wt)
-sum(tree$height)
 
-#with hclustgeo
-tree <- hclustgeo(D,wt=wt)
-sum(tree$height)
-```
+### Find a partition with no constraint
+Ward hierarchical clustering of the 303 municipalities is performed using the dissimilarity matrix `D0` (calculated with the socio-economic variables). The partition in $K=5$ clusters is chosen from the Ward dendrogram.
 
-
-## Ward-like hierarchical clustering with geographical constraints.
-
-Now we consider two dissimilarity matrices : 
-
-  * $D_0$ is the euclidean distance matrix performed with the socio-demographic variables 
-  * $D_1$ is a second dissimilarity matrix used to take the geographical proximity between the cities into account. 
-
-The function __hclustgeo__ implements a Ward-like hierarchical clustering algorithm  including soft contiguity constraints. This algorithm takes as input two dissimilarity matrices 
-D0 and D1 and a mixing parameter $\alpha$ between 0 an 1. The first matrix gives the dissimilarities in the "feature space" (here socio-demographic variables). The second matrix gives the dissimilarities in the  "constraint" space (here the matrix of geographical distances or the matrix build from the contiguity matrix $C$). The mixing parameter $\alpha$ sets the importance of the constraint in the clustering procedure.  We present here a procedure to choose the mixing parameter $\alpha$ with the function __choicealpha__. 
-
-### Choice of a partition with $D_0$ only
-First, we choose $K=5$ clusters from the Ward dendrogram obtained with the socio-demographic variables ($D_0$) only.
-
-```{r}
-library(ClustGeo)
-data(estuary)
-dat <- estuary$dat
-D.geo <- estuary$D.geo
-map <- estuary$map 
-
-D0 <- dist(dat) # the socio-demographic distances
+```{r out.width="80%"}
+D0 <- dist(dat) # the socio-economic distances
 tree <- hclustgeo(D0)
-plot(tree,hang=-1,label=FALSE, xlab="",sub="",
-     main="Ward dendrogram with D0 only",cex.main=0.8,cex=0.8,cex.axis=0.8,cex.lab=0.8)
-#plot(tree,hang=-1,xlab="",sub="",main="Ward dendrogram with D0 only",
-#      cex.main=0.8,cex=0.8,labels=city_label,cex.axis=0.8,cex.lab=0.8)
-rect.hclust(tree,k=5,border=c(4,5,3,2,1))
-legend("topright", legend= paste("cluster",1:5), fill=1:5, cex=0.8,bty="n",border="white")
+plot(tree,hang = -1, label = FALSE, 
+     xlab = "", sub = "",
+     main = "Ward dendrogram with D0 only")
+
+rect.hclust(tree ,k = 5, border = c(4,5,3,2,1))
+legend("topright", legend = paste("cluster",1:5), 
+       fill=1:5,bty= "n", border = "white")
 ```
 
-```{r,echo=FALSE,eval=FALSE}
-postscript("dendroD0.eps")
-#plot(tree,hang=-1,label=FALSE, xlab="",sub="",
-#    cex=0.8,cex.axis=0.8,cex.lab=0.8,main="")
-plot(tree,hang=-1,label=FALSE, xlab="",sub="", main="")
-rect.hclust(tree,k=5,border=c(4,5,3,2,1))
-legend("topright", legend= paste("cluster",1:5), fill=1:5,bty="n",border="white")
-dev.off()
-```
 
-We can use the map given with the estuary data.
-```{r}
-# the map of the cities is an object of class "SpatialPolygonsDataFrame"
-class(map)
-# the object map contains several informations
-names(map)
-head(map@data[,4:8])
-# we check that the cities in map are the same than those in X
-identical(as.vector(map$"INSEE_COM"),rownames(dat))
+This partition is plotted on the `estuay` map. 
 
-# now we plot the cities on the map with the name of four cities
-city_label <- as.vector(map$"NOM_COMM")
-sp::plot(map,border="grey")
-text(sp::coordinates(map)[c(54,99,117,116),],labels=city_label[c(54,99,117,116)],cex=0.8)
-```
-
-Let us plot these 5 clusters on the map.
-```{r}
+```{r out.width="70%"}
 # cut the dendrogram to get the partition in 5 clusters
 P5 <- cutree(tree,5)
+city_label <- as.vector(map$"NOM_COMM")
 names(P5) <- city_label
-sp::plot(map,border="grey",col=P5,main="5 clusters partition obtained with D0 only",cex.main=0.8)
-legend("topleft", legend=paste("cluster",1:5), fill=1:5, cex=0.8,bty="n",border="white")
+
+plot(map, border = "grey", col = P5, 
+         main = "Partition P5 obtained with D0 only")
+legend("topleft", legend = paste("cluster",1:5), 
+       fill = 1:5, bty = "n", border = "white")
 ```
 
-```{r,echo=FALSE,eval=FALSE}
-postscript("map-P5.eps")
-sp::plot(map,border="grey",col=P5)
-#legend(locator(1), legend=paste("cluster",1:5), fill=1:5, bty="n",border="white")
-legend("topleft", inset=0.2,legend=paste("cluster",1:5), fill=1:5, bty="n",border="white")
-dev.off()
-```
 
-We can notice that the cities in the cluster 5 are geographically very homogeneous. 
+This map shows that municipalities in the same cluster of the partition `P5` are not necessary contiguous. For instance municipalities in `cluster 5` are contiguous wehereas municipalities in `cluster 3` are separated. 
+
 ```{r}
-# list of the cities in cluster 5
+# list of the municipalities in cluster 5
 city_label[which(P5==5)]
-#plot(map,border="grey")
-#text(coordinates(map)[which(P5==5),],labels=city_label[which(P5==5)],cex=0.8)
 ```
-On the contrary the cities in cluster 3 are geographically very splitted. 
+ 
 
 
 
 ### Change the partition to take geographical constraint into account
 
-In order to get more geographically compact clusters, we introduce now the matrix $D_1$ of the geographical distances in __hclustgeo__. 
+In order to get more spatially compact clusters, the matrix `D1` of the distances between the town halls of the municipalities, is included in the clustering process along with the mixing parameter `alpha` used to set the importance of `D0` and `D1`.  
 
 ```{r}
-D1 <- as.dist(D.geo) # the geographic distances between the cities
-# 
+D1 <- as.dist(D.geo) # the geographic distances between the municipalities
 ```
 
-For that purpose, we have to choose a mixing parameter $\alpha$ to improve the geographical cohesion of the 5 clusters of the partition found previously without deteriorating the socio-demographic cohesion too much.
+The mixing parameter `alpha` is chosen in such a way that the geographical cohesion of the clusters is improved without  deteriorating too much the socio-economic cohesion.
 
-#### Choice of the mixing parameter $\alpha$
+#### Choice of the mixing parameter `alpha`
 
-The mixing parameter $\alpha \in [0,1]$ sets the importance of $D_0$ and $D_1$ in the clustering process. When $\alpha=0$ the geographical dissimilarities are not taken into account and when $\alpha=1$ it is the socio-demographic distances which are not taken into account and the clusters are obtained with the geographical distances only. 
+The mixing parameter `alpha` in $[0,1]$ sets the importance of `D0` and `D1` in the clustering process. When  `alpha`=0 the geographical dissimilarities are not taken into account and when `alpha`=1 it is the socio-economic distances which are not taken into account and the clusters are obtained with the geographical distances only. 
 
-The idea is then to calculate separately the socio-demographic homogeneity and the geographic cohesion of the partitions obtained for a range of different values of $\alpha$ and a given number of clusters $K$.
-
-The idea is to plot the quality criterion $Q_O$ and $Q_1$ of the partitions $P_K^\alpha$ obtained with different values of $\alpha \in [0,1]$ and to choose the value of $\alpha$ which is a compromise between the lost of socio-demographic homogeneity and the gain of geographic cohesion. We use the function __choicealpha__ for that purpose. 
+The idea is then to calculate separately the socio-economic homogeneity (denoted `Q0`) and the geographic homogneity (denoted `Q1`) of the partitions obtained for a range of different values of `alpha` and a given number of clusters $K$. The homogeneity `Q0` (resp. `Q1`) is the proportion of explained inertia calculated with `D0` (resp. `D1`).
 
 ```{r}
 range.alpha <- seq(0,1,0.1)
 K <- 5
-cr <- choicealpha(D0,D1,range.alpha,K,graph=TRUE)
-cr$Q # proportion of explained pseudo inertia
-cr$Qnorm # normalized proportion of explained pseudo inertia
-?plot.choicealpha
-#plot(cr,norm=TRUE)
+cr <- choicealpha(D0, D1, range.alpha, 
+  K, graph = FALSE)
+cr$Q # proportion of explained inertia
 ``` 
+
+The plot of the curves of  `Q0` and `Q1` is a tool to choose a value of `alpha` that is a compromise between the lost in socio-economic homogeneity and the gain in geographic cohesion. 
+
+```{r out.width="60%"}
+?plot.choicealpha
+plot(cr)
+```
 
 ```{r,echo=FALSE,eval=FALSE}
 #postscript("plotQ-1.eps",width = 950,height = 489)
@@ -200,116 +156,89 @@ plot(cr,norm=TRUE)
 ```
 
 
-We see on the plot the proportion of explained pseudo inertia calculated with $D_0$ (the socio-demographic distances) is equal to 0.81 when $\alpha=0$ and decreases when $\alpha$ inceases (black line).  On the contrary the proportion of explained pseudo inertia calculated with $D_1$ (the socio-demographic distances) is equal to 0.87 when  $\alpha=1$ and decreases when $\alpha$ decreases (red line).
+We see that the proportion of explained inertia calculated with `D0` (the socio-economic distances) is equal to 0.81 when `alpha`=0 and decreases when `alpha` inceases (black line).  On the contrary the proportion of explained inertia calculated with `D1` (the geographical distances) is equal to 0.87 when `alpha`=1 and decreases when `alpha` decreases (red line).
 
-Here the plot suggest to choose $\alpha=0.2$ which correponds to a lost of socio-demographic homogeneity of only 7 \% and a gain of geographic homogeneity of about 17 \%. 
+Here the plot suggest to choose `alpha`=0.2 which correponds to a lost of socio-economic homogeneity of only 7 \% and a gain of geographic homogeneity of about 17 \%. 
 
-#### Modified partition obtained with $\alpha=0.2$.
+#### Modified partition obtained with `alpha`=0.2
 
-We perform __hclustgeo__ with $D_0$ and $D_1$ and $\alpha=0.2$ and cut the tree to get the new partition in 5 clusters.
+The dendrogram obtained with  the function `hclustgeo` and `alpha`=0.2 of  is cut to get the new partition in 5 clusters.
 
 ```{r}
 tree <- hclustgeo(D0,D1,alpha=0.2)
 P5bis <- cutree(tree,5)
 ```
 
-The gain in geographic cohesion of this partition can also be visualized on the map.
-```{r,fig.align="center"}
-tree <- hclustgeo(D0,D1,alpha=0.2)
-P5bis <- cutree(tree,5)
-sp::plot(map,border="grey",col=P5bis, main="5 clusters partition obtained \n with alpha=0.2 and geographical distances",cex.main=0.8)
-legend("topleft", legend=paste("cluster",1:5), fill=1:5, bty="n",border="white")
+The modified partition  `P5bis` is visualized on the map.
+```{r,out.width="70%"}
+sp::plot(map, border = "grey", col = P5bis, 
+         main = "Partition P5bis obtained with alpha=0.2 
+         and geographical distances")
+legend("topleft", legend=paste("cluster",1:5), 
+       fill=1:5, bty="n",border="white")
 ```
 
-```{r,echo=FALSE,eval=FALSE}
-postscript("map-P5bis.eps")
-sp::plot(map,border="grey",col=P5bis)
-#legend(locator(1), legend=paste("cluster",1:5), fill=1:5, bty="n",border="white")
-legend("topleft", inset=0.2,legend=paste("cluster",1:5), fill=1:5, bty="n",border="white")
-dev.off()
-```
+We see that the geographical cohesion of the partition `P5bis` is increased compared to partition `P5`.
+
 
 ### Change the partition to take neighborhood constraint into account
 
-Let us construct a different type of matrix $D_1$ to take the neighborhood between the regions into account for clustering the 303 cities.   
-Two regions with contiguous boundaries, that is sharing one or more boundary point are considered as neighbours.  Let us first build the adjacency matrix $A$.
+Here a different matrix of dissimilarities `D1` is considered to take the neighborhood between the municipalities into account rather than the geographical distance. Two municipalities with contiguous boundaries (sharing one or more boundary point) are considered as neighbours. The adjacency matrix `A` is the binary matrix of the neighbourhoods between the municipalities.
 
 ```{r,fig.height=4,fig.width=4,fig.align="center",warning=FALSE,message=FALSE}
-#library(spdep)
-list.nb <- spdep::poly2nb(map,row.names = rownames(dat)) #list of neighbours of each city
-city_label[list.nb[[117]]] # list of the neighbours of BORDEAUX
-
-A <- spdep::nb2mat(list.nb,style="B")
+library(spdep)
+?poly2nb
+list.nb <- poly2nb(map, row.names = rownames(dat)) #list of neighbours of each city
+?nb2mat
+A <- nb2mat(list.nb,style="B")
 diag(A) <- 1
 colnames(A) <- rownames(A) <- city_label
 A[1:5,1:5]
 ```
 
-The dissimilarity matrix $D_1$ is build from the adjacency matrix $A$ with $D_1=1-A$. 
+The dissimilarity matrix `D1` is then 1 minus `A`. 
 
 ```{r}
 D1 <- as.dist(1-A)
 ```
 
-#### Choice of the mixing parameter $\alpha$
-The same procedure for the choice of $\alpha$ is then used with this neighborhood dissimilarity matrix $D_1$.
+#### Choice of the mixing parameter `alpha`
 
-```{r}
-cr <- choicealpha(D0,D1,range.alpha,K,graph=TRUE)
-cr$Q # proportion of explained pseudo inertia
-cr$Qnorm # normalized proportion of explained pseudo inertia
-```
+The procedure for the choice of `alpha` is repeated here with the new matrix `D1`. 
 
-```{r,echo=FALSE,eval=FALSE}
-#postscript("plotQ-1.eps",width = 950,height = 489)
-plot(cr)
-#dev.off()
-#postscript("plotQnorm-1.eps")
-plot(cr,norm=TRUE)
-#dev.off()
-```
-
-
-```{r}
-tree <- hclustgeo(D0,D1,alpha=0.2)
-P5ter <- cutree(tree,5)
-sp::plot(map,border="grey",col=P5ter, main="5 clusters partition obtained with \n alpha=0.2 and neighbours dissimilarities",cex.main=0.8)
-legend("topleft", legend=paste("cluster",1:5), fill=1:5, bty="n",border="white",cex=0.8)
-```
-
-```{r,echo=FALSE,eval=FALSE}
-postscript("map-P5ter.eps")
-sp::plot(map,border="grey",col=P5ter)
-#legend(locator(1), legend=paste("cluster",1:5), fill=1:5, bty="n",border="white")
-legend("topleft", inset=0.2,legend=paste("cluster",1:5), fill=1:5, bty="n",border="white")
-dev.off()
-```
-
-With this kind of local dissimilaritis in $D_1$, the neighborhood within cohesion is always very small. To overcome this problem, we can use the plot the normalized proportion of explained inertia ($Qnorm$) instead the proportion of explained inertia ($Q$). The plot of $Qnorm$ suggest again $\alpha=0.2$.
-
-#### Modified partition obtained with $\alpha=0.2$.
-
-```{r}
-tree <- hclustgeo(D0,D1,alpha=0.2)
-P5bis <- cutree(tree,5)
-sp::plot(map,border="grey",col=P5bis, main="5 clusters partition obtained with \n alpha=0.2 and neighborhood dissimilarities",cex.main=0.8)
-legend("topleft", legend=1:5, fill=1:5, col=P5,cex=0.8)
-```
-
-### The method __plot.choicealpha__
-
-These plots can be obtained with the plot method __plot.choicealpha__.
-
-```{r}
+```{r out.width="70%"}
 range.alpha <- seq(0,1,0.1)
 K <- 5
-cr <- choicealpha(D0,D1,range.alpha,K,graph=FALSE)
-?plot.choicealpha
-plot(cr,cex=0.8,norm=FALSE,cex.lab=0.8,ylab="pev",col=3:4,legend=c("socio-demo","geo"),
-     xlab="mixing parameter")
+cr <- choicealpha(D0, D1, range.alpha,
+                  K, graph=FALSE)
+plot(cr)
 ```
 
-```{r}
-plot(cr,cex=0.8,norm=TRUE,cex.lab=0.8,ylab="pev",col=5:6,pch=5:6,legend=c("socio-demo","geo"),
-     xlab="mixing parameter")
+The explained inertia calculated here with `D1` (red curve) is much smaller than the explained inertia calculated with `D0` (black curve). To overcome this problem, the normalized proportion of explained inertia (`Qnorm`) is plotted.
+
+```{r out.width='70%'}
+cr$Qnorm # normalized proportion of explained inertia
+plot(cr, norm = TRUE)
 ```
+
+With  `D0` the curve starts from 100% and decreases as `alpha` increases from 0 to 1. With `D1`  the curve starts from 100% (on the right) and decreases as `alpha` decreases from 1 to 0. This plot suggests to choose `alpha`=0.2
+
+#### Modified partition obtained with `alpha`=0.2
+
+The dendrogram obtained with  the function `hclustgeo` and `alpha`=0.2 of  is cut to get a new partition in 5 clusters.
+
+```{r out.width='70%'}
+tree <- hclustgeo(D0, D1, alpha  =0.2)
+P5ter <- cutree(tree,5)
+sp::plot(map, border="grey", col=P5ter, 
+         main=" Partition P5ter obtained with
+         alpha=0.2 and neighborhood dissimilarities")
+legend("topleft", legend=1:5, fill=1:5, col=P5ter)
+```
+
+This partition `P5ter` is spatially more compact than `P5bis`.  This is not surprising since dissimilarities are build from the adjacency matrix which gives  more  importance  local  neighborhoods. However  since  the clustering process  is  based  on  soft contiguity constraints, municipalities that are not neighbors are allowed to be in the same
+clusters.  This is the case for instance for `cluster 4` where some municipalities are located in the north of the estuary whereas most are located in the southern area (corresponding to forest areas). 
+
+##Reference
+M. Chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco. ClustGeo: an R package for hierarchical clustering with spatial constraints.Comput Stat (2018) 33: 1799-1822. 
+

@@ -8,8 +8,9 @@
 #' @details The Ward agreggation measure between to singletons i and j weighted by wi and wj is : (wiwj)/(wi+wj)dij^2
 #' where dij is the dissimilarity between i and j. 
 #' @references 
-#' M.chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco.  ClustGeo:  an R package 
-#' for hierarchical clustering with spatial constraints	arXiv:1707.03897 [stat.CO]
+#' M. Chavent, V. Kuentz-Simonet, A. Labenne, J. Saracco. ClustGeo: an R package
+#' for hierarchical clustering with spatial constraints.
+#' Comput Stat (2018) 33: 1799-1822. 
 #' @export
 
 wardinit <- function(D,wt=NULL) {
@@ -24,15 +25,5 @@ wardinit <- function(D,wt=NULL) {
     S <- matrix(rep(wt,n),n,n)
     delta <- delta/(S+t(S))
   }
-  return(as.dist(delta))
+  return(stats::as.dist(delta))
 } 
-
-# ward_init <- function(d,wt) {
-#   n <- as.integer(attr(d, "Size"))
-#   diss <-  d               
-#   if (is.null(wt)) diss <- d^2/(2*n) else
-#     for (i in 1:(n-1))
-#       for (j in (i+1):n) 
-#         diss[n*(i-1) - i*(i-1)/2 + j-i] <- d[n*(i-1) - i*(i-1)/2 + j-i]^2*wt[i]*wt[j]/(wt[i]+wt[j])
-#   return(diss)
-# }

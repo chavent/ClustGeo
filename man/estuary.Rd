@@ -3,12 +3,14 @@
 \name{estuary}
 \alias{estuary}
 \title{estuary data}
-\format{The R dataset estuary is a list of three objects: 
+\format{
+The R dataset estuary is a list of three objects: 
 \itemize{
 \item{dat: a data frame with the description of the n=303 municipalities on p=4 socio-demographic variables.}
  \item{D.geo: a matrix with the geographical distances between the town hall of the n=303 municipalities.}
  \item{map: an object of class \code{SpatialPolygonsDataFrame} with the map of the gironde estuary.}
- }}
+ }
+}
 \source{
 Original data are issued from the French population census of National Institute 
 of Statistics and Economic Studies for year 2009. The agricultural surface has been 

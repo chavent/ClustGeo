@@ -4,8 +4,12 @@
 \alias{inert}
 \title{Inertia of a cluster}
 \usage{
-inert(Z, indices = 1:nrow(Z), wt = rep(1/nrow(Z), nrow(Z)),
-  M = rep(1, ncol(Z)))
+inert(
+  Z,
+  indices = 1:nrow(Z),
+  wt = rep(1/nrow(Z), nrow(Z)),
+  M = rep(1, ncol(Z))
+)
 }
 \arguments{
 \item{Z}{matrix data}

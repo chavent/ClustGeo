@@ -4,9 +4,19 @@
 \alias{plot.choicealpha}
 \title{Plot to choose the mixing parameter}
 \usage{
-\method{plot}{choicealpha}(x, norm = FALSE, lty = 1:2, pch = c(8,
-  16), type = c("b", "b"), col = 1:2, xlab = "alpha", ylab = NULL,
-  legend = NULL, cex = 1, ...)
+\method{plot}{choicealpha}(
+  x,
+  norm = FALSE,
+  lty = 1:2,
+  pch = c(8, 16),
+  type = c("b", "b"),
+  col = 1:2,
+  xlab = "alpha",
+  ylab = NULL,
+  legend = NULL,
+  cex = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class \code{choicealpha}.}

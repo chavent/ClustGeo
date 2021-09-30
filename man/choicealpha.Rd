@@ -4,8 +4,7 @@
 \alias{choicealpha}
 \title{Choice of the mixing parameter}
 \usage{
-choicealpha(D0, D1, range.alpha, K, wt = NULL, scale = TRUE,
-  graph = TRUE)
+choicealpha(D0, D1, range.alpha, K, wt = NULL, scale = TRUE, graph = TRUE)
 }
 \arguments{
 \item{D0}{a dissimilarity matrix of class \code{dist}. The function \code{\link{as.dist}} can be used to transform an 

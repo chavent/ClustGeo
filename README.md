@@ -1,8 +1,4 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
+
 ## Description
 
 The R package `ClustGeo` implements a Ward-like hierarchical clustering algorithm including spatial/geographical constraints. 
